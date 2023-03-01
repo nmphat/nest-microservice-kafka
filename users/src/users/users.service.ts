@@ -1,3 +1,4 @@
+import { firstValueFrom } from 'rxjs';
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -40,19 +41,27 @@ export class UsersService {
     return this.userList;
   }
 
-  findOne(id: number) {
-    this.authClient
-      .send('login', {
+  async findOne(id: number) {
+    const loginResponse = await firstValueFrom(
+      this.authClient.send('login', {
         username: 'phat',
         password: '123',
-      })
-      .subscribe((data) => {
-        console.log(data);
+      }),
+    );
 
-        if (data.status === 'success') {
-          return this.userList;
-        }
-      });
+    console.log('login', loginResponse);
+
+    if (loginResponse) {
+      if (loginResponse.status === 'success') {
+        console.log(
+          `user service this.userlist find ${id}`,
+          this.userList.find((user) => user.id == id),
+        );
+        const userFound = this.userList.find((user) => user.id == id);
+        return userFound === undefined ? 'not found' : userFound;
+      }
+    }
+    return 'error';
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

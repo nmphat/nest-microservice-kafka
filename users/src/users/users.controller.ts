@@ -28,7 +28,7 @@ export class UsersController implements OnModuleInit {
   }
 
   @MessagePattern('findOneUser')
-  findOne(@Payload() id: number) {
+  async findOne(@Payload() id: number) {
     return this.usersService.findOne(id);
   }
 

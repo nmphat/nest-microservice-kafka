@@ -19,14 +19,18 @@ export class AppController implements OnModuleInit {
   ) {}
   async onModuleInit() {
     this.userClient.subscribeToResponseOf('findOneUser');
+    this.userClient.subscribeToResponseOf('findOneUser.reply');
     await this.userClient.connect();
   }
 
   @Get()
-  getUser() {
-    this.appService.getUser(1);
+  async getAllUser() {
+    return await this.appService.getUser(1);
+  }
 
-    return 'success';
+  @Get(':id')
+  async getUser(@Param('id') id: number) {
+    return await this.appService.getUser(id);
   }
 
   @Post()
